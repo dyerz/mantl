@@ -39,5 +39,5 @@ output "fqdn" {
 }
 
 output "zone_id" {
-  value = "${aws_elb.traefik-internak-elb.zone_id}"
+  value = "${aws_elb.traefik-internal-elb.zone_id}"
 }

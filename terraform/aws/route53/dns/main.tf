@@ -10,6 +10,8 @@ variable hosted_zone_id {}
 variable short_name {}
 variable subdomain { default = "" }
 variable traefik_elb_fqdn {}
+variable traefik_internal_elb_fqdn {}
+variable traefik_internal_subdomain { default = "internal" }
 variable traefik_zone_id {}
 variable worker_count {}
 variable worker_ips {}
@@ -71,6 +73,18 @@ resource "aws_route53_record" "dns-wildcard" {
   alias {
     zone_id = "${var.traefik_zone_id}"
     name = "${var.traefik_elb_fqdn}"
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "internal-dns-wildcard" {
+  zone_id = "${var.hosted_zone_id}"
+  name = "*.${var.traefik_internal_subdomain}${var.subdomain}.${var.domain}"
+  type = "A"
+
+  alias {
+    zone_id = "${var.traefik_zone_id}"
+    name = "${var.traefik_internal_elb_fqdn}"
     evaluate_target_health = true
   }
 }
