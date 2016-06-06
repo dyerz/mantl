@@ -1,0 +1,93 @@
+---
+- name: install traefik
+  sudo: yes
+  yum:
+    name: "{{ traefik_internal_package }}"
+    state: present
+  tags:
+    - traefik-internal
+    - bootstrap
+
+- name: create traefik-internal unit file
+  sudo: yes
+  shell: "cp /etc/systemd/system/traefik.service /etc/systemd/system/traefik-internal.service"
+  tags:
+    - traefik-internal
+    - bootstrap
+
+- name: configure traefik-internal unit file logging
+  sudo: yes
+  replace:
+    dest: /etc/systemd/system/traefik-internal.service
+    regexp: "/var/log/traefik/"
+    replace: '/var/log/traefik-internal/'
+  tags:
+    - traefik-internal
+    - bootstrap
+
+- name: create logging directory for traefik-internal
+  sudo: yes
+  file:
+    dest: /var/log/traefik-internal
+    state: directory
+    owner: traefik
+    group: traefik
+    mode: 0775
+  tags:
+    - traefik-internal
+    - bootstrap
+
+- name: configure traefik-internal config file
+  sudo: yes
+  replace:
+    dest: /etc/systemd/system/traefik-internal.service
+    regexp: "/etc/traefik/"
+    replace: '/etc/traefik-internal/'
+  tags:
+    - traefik-internal
+    - bootstrap
+
+- name: create directory for local traefik service override
+  sudo: yes
+  file:
+    dest: /etc/systemd/system/traefik-internal.service.d
+    state: directory
+    mode: 0755
+  tags:
+    - traefik-internal
+    - bootstrap
+
+- name: create configuration directory for traefik-internal
+  sudo: yes
+  file:
+    dest: /etc/traefik-internal
+    state: directory
+    mode: 0755
+  tags:
+    - traefik-internal
+    - bootstrap
+
+- name: configure traefik
+  sudo: yes
+  template:
+    src: traefik.toml.j2
+    dest: /etc/traefik-internal/traefik.toml
+    owner: traefik
+    group: traefik
+    mode: 0644
+    backup: yes
+  notify:
+    - reload systemd
+    - restart traefik-internal
+  tags:
+    - traefik-internal
+
+- name: generate traefik consul service
+  sudo: yes
+  copy:
+    src: 'traefik-consul.json'
+    dest: '/etc/consul/traefik-internal.json'
+  notify:
+    - reload consul
+  tags:
+    - traefik-internal

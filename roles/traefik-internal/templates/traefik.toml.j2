@@ -1,0 +1,14 @@
+graceTimeOut = 10
+logLevel = "ERROR"
+
+[entryPoints]
+  [entryPoints.http]
+  address = ":82"
+
+[web]
+address = ":8082"
+
+[consulCatalog]
+endpoint = "{{ traefik_internal_consul_endpoint }}"
+domain = "{{ traefik_internal_consul_domain }}"
+prefix = "traefik"
