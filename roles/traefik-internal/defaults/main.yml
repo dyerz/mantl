@@ -1,4 +1,4 @@
 ---
-traefik_internal_package: traefik-0.0.0
+traefik_internal_package: traefik-1.0.0
 traefik_internal_consul_endpoint: consul.service.consul:8500
 traefik_internal_consul_domain: consul-internal.localhost
