@@ -1,9 +1,17 @@
 ---
 - name: install traefik
   sudo: yes
-  yum:
-    name: "{{ traefik_internal_package }}"
-    state: present
+  get_url:
+    url: https://github.com/containous/traefik/releases/download/v1.0.0-rc2/traefik_linux-amd64
+    dest: /usr/bin/traefik-internal
+    mode: 0755
+  tags:
+    - traefik-internal
+    - bootstrap
+
+- name: Grant permission to bind to priviledged port
+  sudo: yes
+  shell: "setcap 'cap_net_bind_service=+ep' /usr/bin/traefik-internal"
   tags:
     - traefik-internal
     - bootstrap
@@ -19,8 +27,24 @@
   sudo: yes
   replace:
     dest: /etc/systemd/system/traefik-internal.service
-    regexp: "/var/log/traefik/"
-    replace: '/var/log/traefik-internal/'
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  with_items:
+    - { regexp: '/etc/traefik/',     replace: '/etc/traefik-internal/'     }
+    - { regexp: '/var/log/traefik/', replace: '/var/log/traefik-internal/' }
+    - { regexp: '/usr/bin/traefik ', replace: '/usr/bin/traefik-internal ' } # Note space after binary name is important for idempotents
+    - { regexp: '/usr/bin/traefik-internal -c ', replace: '/usr/bin/traefik-internal -c' } # Remove space after -c argument if its there...
+  tags:
+    - traefik-internal
+    - bootstrap
+
+- name: configure traefik-internal to ignore consul http certificate validation
+  sudo: yes
+  lineinfile:
+    dest: /etc/systemd/system/traefik-internal.service
+    insertafter: '^\[Service\]'
+    line: 'Environment=CONSUL_HTTP_SSL_VERIFY=false'
+    state: present
   tags:
     - traefik-internal
     - bootstrap
@@ -33,16 +57,6 @@
     owner: traefik
     group: traefik
     mode: 0775
-  tags:
-    - traefik-internal
-    - bootstrap
-
-- name: configure traefik-internal config file
-  sudo: yes
-  replace:
-    dest: /etc/systemd/system/traefik-internal.service
-    regexp: "/etc/traefik/"
-    replace: '/etc/traefik-internal/'
   tags:
     - traefik-internal
     - bootstrap
