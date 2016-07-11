@@ -1,13 +1,4 @@
 ---
-- name: evaluate first_master
-  add_host:
-    name: "{{ groups[master_group_name][0] }}"
-    groups: first_master
-    when: "master in groups and groups[master_group_name] | length > 1"
-  tags:
-    - common
-    - kubernetes
-
 - name: create kubernetes config directories
   sudo: yes
   file:
@@ -25,7 +16,7 @@
 
 - name: pull hyperkube docker image
   sudo: yes
-  command: "docker pull gcr.io/google_containers/hyperkube:{{ kube_version }}"
+  command: "docker pull {{ kube_hyperkube_image }}:{{ kube_version }}"
   register: docker_pull_result
   changed_when: docker_pull_result.stdout.find('newer') > -1
   tags:

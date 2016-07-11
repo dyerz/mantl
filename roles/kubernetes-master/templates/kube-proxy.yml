@@ -7,13 +7,14 @@ spec:
   hostNetwork: true
   containers:
   - name: kube-proxy
-    image: gcr.io/google_containers/hyperkube:{{ kube_version }}
+    image: "{{ kube_hyperkube_image }}:{{ kube_version }}"
     command:
     - /hyperkube
     - proxy
     - --master=https://kubernetes.service.consul:{{ kube_master_port }}
     - --kubeconfig=/etc/kubernetes/master.kubeconfig
     - --proxy-mode=iptables
+    - --v={{kube_log_level}}
     securityContext:
       privileged: true
     volumeMounts:
