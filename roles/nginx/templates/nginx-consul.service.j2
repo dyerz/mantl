@@ -22,6 +22,7 @@ ExecStart=/usr/bin/docker run \
     -v /etc/pki/tls:/etc/pki/tls:ro \
     -v /etc/nginx/templates:/etc/nginx/templates:ro \
     --env-file=/etc/default/nginx-consul.env \
+    --log-driver=none \
     {{ consul_nginx_image }}:{{ consul_nginx_image_tag }}
 
 ExecStop=/usr/bin/docker kill nginx-consul
