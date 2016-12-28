@@ -36,7 +36,7 @@ resource "aws_instance" "instance" {
   vpc_security_group_ids = [ "${split(",", var.security_group_ids)}"]
   key_name = "${var.ssh_key_pair}"
   associate_public_ip_address = true
-  subnet_id = "${element(split(",", var.vpc_subnet_ids), count.index)}" 
+  subnet_id = "${element(split(",", var.vpc_subnet_ids), count.index)}"
   iam_instance_profile = "${var.iam_profile}"
   root_block_device {
     delete_on_termination = true
@@ -65,13 +65,13 @@ resource "aws_volume_attachment" "instance-lvm-attachment" {
 
 
 output "hostname_list" {
-  value = "${join(\",\", aws_instance.instance.*.tags.Name)}"
+  value = "${join(",", aws_instance.instance.*.tags.Name)}"
 }
 
 output "ec2_ids" {
-  value = "${join(\",\", aws_instance.instance.*.id)}"
+  value = "${join(",", aws_instance.instance.*.id)}"
 }
 
 output "ec2_ips" {
-  value = "${join(\",\", aws_instance.instance.*.public_ip)}"
+  value = "${join(",", aws_instance.instance.*.public_ip)}"
 }
