@@ -9,9 +9,9 @@ resource "aws_elb" "traefik-internal-elb" {
   idle_timeout = 400
   connection_draining = true
   connection_draining_timeout = 400
-  subnets = ["${split(\",\", var.subnets)}"]
-  security_groups = ["${split(\",\", var.security_groups)}"]
-  instances = ["${split(\",\", var.instances)}"]
+  subnets = ["${split(",", var.subnets)}"]
+  security_groups = ["${split(",", var.security_groups)}"]
+  instances = ["${split(",", var.instances)}"]
   internal = true
 
   listener {
